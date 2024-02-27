@@ -1,0 +1,4 @@
+name: warps
+version: '${version}'
+main: org.pantouflemc.warps.Warps
+api-version: '1.20'
