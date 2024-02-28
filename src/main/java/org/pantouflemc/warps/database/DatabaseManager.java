@@ -82,15 +82,15 @@ public class DatabaseManager {
         Statement statement = connection.createStatement();
 
         // Create the warps table
-        statement.execute("CREATE TABLE IF NOT EXISTS warps ("
+        statement.execute("CREATE TABLE IF NOT EXISTS warps("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + "x DOUBLE NOT NULL"
-                + "y DOUBLE NOT NULL"
-                + "z DOUBLE NOT NULL"
-                + "pitch DOUBLE NOT NULL"
-                + "yaw DOUBLE NOT NULL"
-                + "name VARCHAR(32) NOT NULL"
-                + "world VARCHAR(32) NOT NULL"
+                + "x DOUBLE NOT NULL,"
+                + "y DOUBLE NOT NULL,"
+                + "z DOUBLE NOT NULL,"
+                + "pitch DOUBLE NOT NULL,"
+                + "yaw DOUBLE NOT NULL,"
+                + "name VARCHAR(32) NOT NULL,"
+                + "world VARCHAR(32) NOT NULL,"
                 + "permission INTEGER NOT NULL" // 0 = authorized, 1 = closed
                 + ");");
         statement.close();
@@ -174,7 +174,7 @@ public class DatabaseManager {
 
             World wor = Bukkit.getWorld(world);
             if (wor != null) {
-                return new Location(wor, x, y, z, (float) pitch, (float) yaw);
+                return new Location(wor, x, y, z, (float) yaw, (float) pitch);
             }
         }
         statement.close();

@@ -9,17 +9,13 @@ authors: [PantoufleMC, Doriantrn]
 commands:
   warps.create:
     description: Create a warp
-    usage: /<command> <name>
     aliases: [createwarp]
   warps.delete:
     description: Delete a warp
-    usage: /<command> <name>
     aliases: [deletewarp]
   warps.list:
     description: List all warps
-    usage: /<command>
     aliases: [listwarps]
   warps.teleport:
     description: Teleport to a warp
-    usage: /<command> <name>
     aliases: [warp]

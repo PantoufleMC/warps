@@ -1,9 +1,13 @@
 package org.pantouflemc.warps;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.List;
 import java.util.logging.Logger;
 import org.pantouflemc.warps.database.DatabaseManager;
 
@@ -19,7 +23,18 @@ public final class Warps extends JavaPlugin {
         // Plugin startup logic
         instance = this;
         logger = this.getLogger();
-        databaseManager = new DatabaseManager();
+        try{
+            databaseManager = new DatabaseManager();
+        }
+        catch (Exception e) {
+            logger.info(e.getMessage());
+        }
+
+        this.getCommand("warps.create").setExecutor(new org.pantouflemc.warps.commands.WarpCreate(this));
+        this.getCommand("warps.teleport").setExecutor(new org.pantouflemc.warps.commands.WarpTeleport(this));
+        this.getCommand("warps.delete").setExecutor(new org.pantouflemc.warps.commands.WarpDelete(this));
+        this.getCommand("warps.list").setExecutor(new org.pantouflemc.warps.commands.WarpList(this));
+
 
     }
 
@@ -39,26 +54,30 @@ public final class Warps extends JavaPlugin {
      * @param player The player who created the warp (command sender).
      * @param warpName The name of the warp.
      */
-    public void createWarp(OfflinePlayer player, String warpName){
+    public boolean createWarp(OfflinePlayer player, String warpName){
         Location location = player.getPlayer().getLocation();
         try {
             databaseManager.createWarp(location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw(), warpName, location.getWorld().getName(), 0);
         }
         catch (Exception e) {
             getLogger().info(e.getMessage());
+            return false;
         }
+        return true;
     }
 
     /**
      * Delete a warp from the database.
      * @param warpName The name of the warp to delete.
      */
-    public void deleteWarp(String warpName){
+    public boolean deleteWarp(String warpName){
         try {
             databaseManager.deleteWarp(warpName);
+            return true;
         }
         catch (Exception e) {
             getLogger().info(e.getMessage());
+            return false;
         }
     }
 
@@ -68,13 +87,38 @@ public final class Warps extends JavaPlugin {
      * @param warpName The name of the warp.
      */
 
-    public void teleportPlayer(OfflinePlayer player, String warpName){
+    public boolean teleportPlayer(OfflinePlayer player, String warpName){
         try {
             Location location = databaseManager.getWarp(warpName);
             player.getPlayer().teleport(location);
+            return true;
         }
         catch (Exception e) {
             getLogger().info(e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get the list of warps.
+     * @return The list of warps.
+     */
+    public boolean getWarps(OfflinePlayer player) {
+        try {
+            List<String> warpList = databaseManager.getWarps();
+            String warps = String.join(", ", warpList);
+
+            Component message =
+                    Component.text("List of warps: ", NamedTextColor.YELLOW)
+                            .append(Component.text(warps, NamedTextColor.WHITE))
+                            .append(Component.text(".", NamedTextColor.YELLOW));
+
+            Player pla = (Player) player;
+            pla.sendMessage(message);
+            return true;
+        } catch (Exception e) {
+            getLogger().info(e.getMessage());
+            return false;
         }
     }
 }
