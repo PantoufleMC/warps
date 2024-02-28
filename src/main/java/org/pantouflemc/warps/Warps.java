@@ -1,9 +1,13 @@
 package org.pantouflemc.warps;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.List;
 import java.util.logging.Logger;
 import org.pantouflemc.warps.database.DatabaseManager;
 
@@ -29,6 +33,7 @@ public final class Warps extends JavaPlugin {
         this.getCommand("warps.create").setExecutor(new org.pantouflemc.warps.commands.WarpCreate(this));
         this.getCommand("warps.teleport").setExecutor(new org.pantouflemc.warps.commands.WarpTeleport(this));
         this.getCommand("warps.delete").setExecutor(new org.pantouflemc.warps.commands.WarpDelete(this));
+        this.getCommand("warps.list").setExecutor(new org.pantouflemc.warps.commands.WarpList(this));
 
 
     }
@@ -89,6 +94,29 @@ public final class Warps extends JavaPlugin {
             return true;
         }
         catch (Exception e) {
+            getLogger().info(e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get the list of warps.
+     * @return The list of warps.
+     */
+    public boolean getWarps(OfflinePlayer player) {
+        try {
+            List<String> warpList = databaseManager.getWarps();
+            String warps = String.join(", ", warpList);
+
+            Component message =
+                    Component.text("List of warps: ", NamedTextColor.YELLOW)
+                            .append(Component.text(warps, NamedTextColor.WHITE))
+                            .append(Component.text(".", NamedTextColor.YELLOW));
+
+            Player pla = (Player) player;
+            pla.sendMessage(message);
+            return true;
+        } catch (Exception e) {
             getLogger().info(e.getMessage());
             return false;
         }
