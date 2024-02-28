@@ -137,4 +137,20 @@ public class DatabaseManager {
         statement.close();
     }
 
+    /**
+     * Delete a warp from the database
+     *
+     * @param name
+     * @throws SQLException
+     */
+    public void deleteWarp(String name) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("DELETE FROM warps WHERE name = ?;");
+        statement.setString(1, name);
+        int affectedRows = statement.executeUpdate();
+        if (affectedRows == 0) {
+            throw new SQLException("Deleting a warp failed, no rows affected.");
+        }
+        statement.close();
+    }
+
 }

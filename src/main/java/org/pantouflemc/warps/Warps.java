@@ -48,4 +48,23 @@ public final class Warps extends JavaPlugin {
             getLogger().info(e.getMessage());
         }
     }
+
+    /**
+     * Delete a warp from the database.
+     * @param warpName The name of the warp to delete.
+     */
+    public void deleteWarp(String warpName){
+        try {
+            databaseManager.deleteWarp(warpName);
+        }
+        catch (Exception e) {
+            getLogger().info(e.getMessage());
+        }
+    }
+
+    /**
+     * Teleport a player to a warp.
+     * @param player The player to teleport.
+     * @param warpName The name of the warp.
+     */
 }
