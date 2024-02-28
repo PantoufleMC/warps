@@ -67,4 +67,14 @@ public final class Warps extends JavaPlugin {
      * @param player The player to teleport.
      * @param warpName The name of the warp.
      */
+
+    public void teleportPlayer(OfflinePlayer player, String warpName){
+        try {
+            Location location = databaseManager.getWarp(warpName);
+            player.getPlayer().teleport(location);
+        }
+        catch (Exception e) {
+            getLogger().info(e.getMessage());
+        }
+    }
 }
