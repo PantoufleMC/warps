@@ -30,4 +30,22 @@ public final class Warps extends JavaPlugin {
     }
 
 
+    /*
+     * The following methods are used to interact with the database.
+     */
+
+    /**
+     * Create a new warp in the database.
+     * @param player The player who created the warp (command sender).
+     * @param warpName The name of the warp.
+     */
+    public void createWarp(OfflinePlayer player, String warpName){
+        Location location = player.getPlayer().getLocation();
+        try {
+            databaseManager.createWarp(location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw(), warpName, location.getWorld().getName(), 0);
+        }
+        catch (Exception e) {
+            getLogger().info(e.getMessage());
+        }
+    }
 }

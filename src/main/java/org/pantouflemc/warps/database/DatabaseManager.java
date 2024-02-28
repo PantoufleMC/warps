@@ -96,4 +96,45 @@ public class DatabaseManager {
         statement.close();
     }
 
+    /**
+     * Create a new warp in the database
+     *
+     * @param x
+     * @param y
+     * @param z
+     * @param pitch
+     * @param yaw
+     * @param name
+     * @param world
+     * @param permission
+     * @throws SQLException
+     */
+    public void createWarp(double x, double y, double z, double pitch, double yaw, String name, String world, int permission) throws SQLException {
+
+        //check if a warp with the same name already exists
+        PreparedStatement statementCheck = connection.prepareStatement("SELECT * FROM warps WHERE name = ?;");
+        statementCheck.setString(1, name);
+        ResultSet resultSet = statementCheck.executeQuery();
+        if (resultSet.next()) {
+            throw new SQLException("A warp with the same name already exists.");
+        }
+        statementCheck.close();
+
+
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO warps (x, y, z, pitch, yaw, name, world, permission) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
+        statement.setDouble(1, x);
+        statement.setDouble(2, y);
+        statement.setDouble(3, z);
+        statement.setDouble(4, pitch);
+        statement.setDouble(5, yaw);
+        statement.setString(6, name);
+        statement.setString(7, world);
+        statement.setInt(8, permission);
+        int affectedRows = statement.executeUpdate();
+        if (affectedRows == 0) {
+            throw new SQLException("Creating a warp failed, no rows affected.");
+        }
+        statement.close();
+    }
+
 }
