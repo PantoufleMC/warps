@@ -27,6 +27,7 @@ public final class Warps extends JavaPlugin {
         }
 
         this.getCommand("warps.create").setExecutor(new org.pantouflemc.warps.commands.WarpCreate(this));
+        this.getCommand("warps.teleport").setExecutor(new org.pantouflemc.warps.commands.WarpTeleport(this));
 
     }
 
@@ -77,13 +78,15 @@ public final class Warps extends JavaPlugin {
      * @param warpName The name of the warp.
      */
 
-    public void teleportPlayer(OfflinePlayer player, String warpName){
+    public boolean teleportPlayer(OfflinePlayer player, String warpName){
         try {
             Location location = databaseManager.getWarp(warpName);
             player.getPlayer().teleport(location);
+            return true;
         }
         catch (Exception e) {
             getLogger().info(e.getMessage());
+            return false;
         }
     }
 }

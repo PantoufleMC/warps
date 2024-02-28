@@ -174,7 +174,7 @@ public class DatabaseManager {
 
             World wor = Bukkit.getWorld(world);
             if (wor != null) {
-                return new Location(wor, x, y, z, (float) pitch, (float) yaw);
+                return new Location(wor, x, y, z, (float) yaw, (float) pitch);
             }
         }
         statement.close();
