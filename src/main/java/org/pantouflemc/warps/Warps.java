@@ -19,7 +19,14 @@ public final class Warps extends JavaPlugin {
         // Plugin startup logic
         instance = this;
         logger = this.getLogger();
-        databaseManager = new DatabaseManager();
+        try{
+            databaseManager = new DatabaseManager();
+        }
+        catch (Exception e) {
+            logger.info(e.getMessage());
+        }
+
+        this.getCommand("warps.create").setExecutor(new org.pantouflemc.warps.commands.WarpCreate(this));
 
     }
 
@@ -39,14 +46,16 @@ public final class Warps extends JavaPlugin {
      * @param player The player who created the warp (command sender).
      * @param warpName The name of the warp.
      */
-    public void createWarp(OfflinePlayer player, String warpName){
+    public boolean createWarp(OfflinePlayer player, String warpName){
         Location location = player.getPlayer().getLocation();
         try {
             databaseManager.createWarp(location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw(), warpName, location.getWorld().getName(), 0);
         }
         catch (Exception e) {
             getLogger().info(e.getMessage());
+            return false;
         }
+        return true;
     }
 
     /**
