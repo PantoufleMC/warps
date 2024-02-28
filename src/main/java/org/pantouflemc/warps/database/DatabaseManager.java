@@ -153,4 +153,50 @@ public class DatabaseManager {
         statement.close();
     }
 
+    /**
+     * Create Location from a warp in the database
+     *
+     * @param name
+     * @return Location of the warp
+     * @throws SQLException
+     */
+    public @Nullable Location getWarp(String name) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM warps WHERE name = ?;");
+        statement.setString(1, name);
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            double x = resultSet.getDouble("x");
+            double y = resultSet.getDouble("y");
+            double z = resultSet.getDouble("z");
+            double pitch = resultSet.getDouble("pitch");
+            double yaw = resultSet.getDouble("yaw");
+            String world = resultSet.getString("world");
+
+            World wor = Bukkit.getWorld(world);
+            if (wor != null) {
+                return new Location(wor, x, y, z, (float) pitch, (float) yaw);
+            }
+        }
+        statement.close();
+
+        throw new SQLException("Warp not found.");
+    }
+
+    /**
+     * Get all warps from the database
+     *
+     * @return List of all warps
+     * @throws SQLException
+     */
+    public List<String> getWarps() throws SQLException {
+        List<String> warps = new ArrayList<>();
+        PreparedStatement statement = connection.prepareStatement("SELECT name FROM warps;");
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            warps.add(resultSet.getString("name"));
+        }
+        statement.close();
+        return warps;
+    }
+
 }
