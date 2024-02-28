@@ -28,6 +28,8 @@ public final class Warps extends JavaPlugin {
 
         this.getCommand("warps.create").setExecutor(new org.pantouflemc.warps.commands.WarpCreate(this));
         this.getCommand("warps.teleport").setExecutor(new org.pantouflemc.warps.commands.WarpTeleport(this));
+        this.getCommand("warps.delete").setExecutor(new org.pantouflemc.warps.commands.WarpDelete(this));
+
 
     }
 
@@ -63,12 +65,14 @@ public final class Warps extends JavaPlugin {
      * Delete a warp from the database.
      * @param warpName The name of the warp to delete.
      */
-    public void deleteWarp(String warpName){
+    public boolean deleteWarp(String warpName){
         try {
             databaseManager.deleteWarp(warpName);
+            return true;
         }
         catch (Exception e) {
             getLogger().info(e.getMessage());
+            return false;
         }
     }
 
