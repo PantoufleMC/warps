@@ -6,9 +6,13 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
 import java.util.logging.Logger;
+
 import org.pantouflemc.warps.database.DatabaseManager;
 
 public final class Warps extends JavaPlugin {
@@ -16,6 +20,7 @@ public final class Warps extends JavaPlugin {
     private static DatabaseManager databaseManager;
     private static Warps instance;
     private static Logger logger;
+    private int teleportationDelay = 3;
 
 
     @Override
@@ -23,10 +28,9 @@ public final class Warps extends JavaPlugin {
         // Plugin startup logic
         instance = this;
         logger = this.getLogger();
-        try{
+        try {
             databaseManager = new DatabaseManager();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.info(e.getMessage());
         }
 
@@ -51,15 +55,15 @@ public final class Warps extends JavaPlugin {
 
     /**
      * Create a new warp in the database.
-     * @param player The player who created the warp (command sender).
+     *
+     * @param player   The player who created the warp (command sender).
      * @param warpName The name of the warp.
      */
-    public boolean createWarp(OfflinePlayer player, String warpName){
+    public boolean createWarp(OfflinePlayer player, String warpName) {
         Location location = player.getPlayer().getLocation();
         try {
             databaseManager.createWarp(location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw(), warpName, location.getWorld().getName(), 0);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             getLogger().info(e.getMessage());
             return false;
         }
@@ -68,14 +72,14 @@ public final class Warps extends JavaPlugin {
 
     /**
      * Delete a warp from the database.
+     *
      * @param warpName The name of the warp to delete.
      */
-    public boolean deleteWarp(String warpName){
+    public boolean deleteWarp(String warpName) {
         try {
             databaseManager.deleteWarp(warpName);
             return true;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             getLogger().info(e.getMessage());
             return false;
         }
@@ -83,24 +87,66 @@ public final class Warps extends JavaPlugin {
 
     /**
      * Teleport a player to a warp.
-     * @param player The player to teleport.
+     *
+     * @param player   The player to teleport.
      * @param warpName The name of the warp.
      */
 
-    public boolean teleportPlayer(OfflinePlayer player, String warpName){
+    public boolean teleportPlayer(OfflinePlayer player, String warpName) {
+        Location location;
         try {
-            Location location = databaseManager.getWarp(warpName);
-            player.getPlayer().teleport(location);
-            return true;
-        }
-        catch (Exception e) {
+            location = databaseManager.getWarp(warpName);
+        } catch (Exception e) {
             getLogger().info(e.getMessage());
             return false;
         }
+
+        //get 3 coo of player
+        double x = player.getPlayer().getX();
+        double y = player.getPlayer().getY();
+        double z = player.getPlayer().getZ();
+        Location oldLocation = new Location(player.getPlayer().getWorld(), x, y, z);
+
+        BukkitScheduler scheduler = getServer().getScheduler();
+
+        try {
+            new BukkitRunnable() {
+                int delay = teleportationDelay;
+
+                @Override
+                public void run() {
+                    if(player.getPlayer().getLocation().distance(oldLocation) > 0.7){
+                        Component message =
+                                Component.text("You moved. Teleportation canceled.", NamedTextColor.RED);
+
+                        player.getPlayer().sendMessage(message);
+                        cancel();
+
+                    } else if (delay==0) {
+                        player.getPlayer().teleport(location);
+                        cancel();
+                    } else {
+                        Component message =
+                                Component.text("Teleportation in ", NamedTextColor.YELLOW)
+                                        .append(Component.text((delay) + "s", NamedTextColor.RED))
+                                        .append(Component.text(" please don't move.", NamedTextColor.YELLOW));
+
+                        player.getPlayer().sendMessage(message);
+                        delay -= 1;
+                    }
+
+                }
+            }.runTaskTimer(this, 0, 20);
+        } catch (Exception e) {
+            getLogger().info(e.getMessage());
+            return false;
+        }
+        return true;
     }
 
     /**
      * Get the list of warps.
+     *
      * @return The list of warps.
      */
     public boolean getWarps(OfflinePlayer player) {
